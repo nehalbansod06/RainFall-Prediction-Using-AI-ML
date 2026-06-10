@@ -26,20 +26,35 @@ python app_flask.py
 
 Notes:
 - The `run.sh` and the manual commands create a `.venv` virtual environment and install dependencies from `requirements.txt`.
-- `demo.html` is a frontend that talks to the running Flask server — opening the HTML file alone does not start the Python server. You must run the Flask app locally (with `run.sh` / manual steps) or deploy the app to a host (Vercel, Render, etc.) so the frontend can reach it.
-- If you plan to run on a server, consider using a production WSGI server instead of the built-in Flask dev server.
+- `demo.html` is a frontend that talks to the running Flask server — opening the HTML file alone does not start the Python server. You must run the Flask app locally (with `run.sh` / manual steps) or deploy the app to a host so the frontend can reach it.
+- Vercel serverless functions are not a good fit for this app because its Python dependency bundle exceeds the 500 MB Lambda storage limit.
+- For production deployment, use a container-based host such as Render, Fly, or Google Cloud Run.
 
-Deploying to Vercel via GitHub
---------------------------------
+Docker deployment
+----------------
 
-1. Commit and push this repository to a GitHub repo.
-2. In the Vercel dashboard choose "Import Project" → "Connect Git Repository" and select the repo.
-3. When prompted, set the Framework Preset to "Other" (or leave default). Vercel will use the `vercel.json` file included in the repo.
-4. No build command or output directory is required for the `@vercel/python` builder; leave those blank unless Vercel asks otherwise.
-5. Deploy. Vercel will install dependencies from `requirements.txt` and route requests to `app_flask.py`.
+This app is best deployed using a container-based platform because Vercel serverless is too restrictive for the Python packages used here.
 
-Notes & troubleshooting
-- Ensure `app_flask.py` exposes the Flask application as the variable `app` (it does).
-- If your app imports heavy native libraries that are incompatible with Vercel's serverless environment, consider deploying to a container-based host (Render, Railway, Fly, or Cloud Run).
-- If the automatic build fails due to missing packages, check the Vercel build logs and add any missing packages to `requirements.txt`.
+Build locally:
+
+```bash
+docker build -t aether-flask .
+```
+
+Run locally:
+
+```bash
+docker run --rm -p 5000:5000 aether-flask
+```
+
+Then open http://127.0.0.1:5000.
+
+Deploy on Render:
+
+1. Push this repo to GitHub.
+2. Create a new Web Service on Render.
+3. Connect the GitHub repo and choose Docker as the environment.
+4. Render will build with the included `Dockerfile` and run the app on port 5000.
+
+If you still want to use Vercel for static assets only, host the frontend separately and point it at a backend host running this Flask app.
 
