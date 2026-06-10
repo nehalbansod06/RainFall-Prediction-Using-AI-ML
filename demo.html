@@ -1226,7 +1226,7 @@ function cleanupSetupDecorations() {
    API KEY
 ════════════════════════════════════════════════ */
 const API_KEY = "65d26ca89e2a3c6dd6040b5fee7e344c";
-const PYTHON_API_BASE = "http://127.0.0.1:5000";
+const PYTHON_API_BASE = window.location.origin === "null" ? "http://127.0.0.1:5000" : "";
 
 let currentCity = '';
 let refreshTimer = null;
